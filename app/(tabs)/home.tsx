@@ -193,8 +193,7 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 16,
     color: '#333333',
-  },
-  searchContainer: {
+  },  searchContainer: {
     height: 48,
     marginHorizontal: 16,
     marginTop: 8,
@@ -213,6 +212,9 @@ const styles = StyleSheet.create({
       },
       android: {
         elevation: 3,
+      },
+      web: {
+        boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.1)',
       },
     }),
   },
@@ -245,8 +247,7 @@ const styles = StyleSheet.create({
   dealsScroll: {
     paddingHorizontal: 16,
     gap: 16,
-  },
-  dealCard: {
+  },  dealCard: {
     width: 200,
     height: 180,
     backgroundColor: '#FFFFFF',
@@ -261,6 +262,9 @@ const styles = StyleSheet.create({
       },
       android: {
         elevation: 4,
+      },
+      web: {
+        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
       },
     }),
   },

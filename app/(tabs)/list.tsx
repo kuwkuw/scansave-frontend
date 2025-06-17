@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
-    Platform,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View
+  Platform,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -256,13 +256,16 @@ const styles = StyleSheet.create({
       android: {
         elevation: 2,
       },
+      web: {
+        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+      },
     }),
   },
   addButton: {
     padding: 8,
   },
   itemContainer: {
-    backgroundColor: Platform.select({ ios: '#FFFFFF99', android: '#FFFFFF' }),
+    backgroundColor: Platform.select({ ios: '#FFFFFF99', android: '#FFFFFF', web: '#FFFFFF' }),
     borderRadius: 8,
     marginBottom: 8,
     ...Platform.select({
@@ -274,6 +277,9 @@ const styles = StyleSheet.create({
       },
       android: {
         elevation: 2,
+      },
+      web: {
+        boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.1)',
       },
     }),
   },

@@ -128,8 +128,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-  },
-  header: {
+  },  header: {
     height: 56,
     flexDirection: 'row',
     alignItems: 'center',
@@ -145,6 +144,9 @@ const styles = StyleSheet.create({
       },
       android: {
         elevation: 2,
+      },
+      web: {
+        boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.1)',
       },
     }),
   },
@@ -195,8 +197,7 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 16,
     gap: 16,
-  },
-  productCard: {
+  },  productCard: {
     height: 120,
     flexDirection: 'row',
     alignItems: 'center',
@@ -213,6 +214,9 @@ const styles = StyleSheet.create({
       },
       android: {
         elevation: 3,
+      },
+      web: {
+        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
       },
     }),
   },
