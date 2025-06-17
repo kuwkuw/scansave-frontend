@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
-  Platform,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View
+    Platform,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -366,5 +366,18 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  itemName: {
+    fontSize: 16,
+    color: '#333333',
+  },
+  completedItem: {
+    textDecorationLine: 'line-through',
+    color: '#666666',
+  },
+  storeText: {
+    fontSize: 12,
+    color: '#666666',
+    marginTop: 4,
   },
 });

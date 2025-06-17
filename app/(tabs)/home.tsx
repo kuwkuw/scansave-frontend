@@ -1,12 +1,12 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
-    Platform,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -22,10 +22,12 @@ type HotDeal = {
   discount: number;
 };
 
+type IconName = React.ComponentProps<typeof Ionicons>['name'];
+
 type Category = {
   id: string;
   name: string;
-  icon: keyof typeof Ionicons.glyphs;
+  icon: IconName;
 };
 
 const dummyDeals: HotDeal[] = [
