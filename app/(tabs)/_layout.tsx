@@ -32,9 +32,10 @@ export default function TabLayout() {
         tabBarInactiveTintColor: INACTIVE_COLOR,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabBarLabel,
+        initialRouteName: "home"
       }}>
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
