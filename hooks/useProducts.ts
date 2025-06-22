@@ -1,0 +1,70 @@
+// This file provides a typed API client for the backend product service
+import { useEffect, useState } from 'react';
+
+export interface Product {
+  id: number;
+  name: string;
+  price: number;
+  oldPrice?: number;
+  imageUrl?: string;
+  store: string;
+  category: string;
+  lastUpdated: string;
+  productUrl: string;
+}
+
+export async function fetchProducts(): Promise<Product[]> {
+  const res = await fetch('http://localhost:3000/products');
+  if (!res.ok) throw new Error('Failed to fetch products');
+  return res.json();
+}
+
+/**
+ * Fetch latest products from the backend, optionally filtered by limit, category, and store.
+ */
+export async function fetchLatestProducts({ limit = 10, category, store }: { limit?: number; category?: string; store?: string } = {}): Promise<Product[]> {
+  const params = new URLSearchParams();
+  if (limit) params.append('limit', limit.toString());
+  if (category) params.append('category', category);
+  if (store) params.append('store', store);
+  const url = `http://localhost:3000/products/latest?${params.toString()}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch latest products');
+  return res.json();
+}
+
+
+export function useProducts() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchProducts()
+      .then(setProducts)
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { products, loading, error };
+}
+
+/**
+ * React hook to fetch latest products from the backend, optionally filtered by limit, category, and store.
+ */
+export function useLatestProducts({ limit = 10, category, store }: { limit?: number; category?: string; store?: string } = {}) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchLatestProducts({ limit, category, store })
+      .then(setProducts)
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [limit, category, store]);
+
+  return { products, loading, error };
+}
+

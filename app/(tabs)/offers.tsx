@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { FlatList, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlatList, Platform, ScrollView, StyleSheet, TouchableOpacity, View, Image } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useLatestProducts } from '@/hooks/useProducts';
 
 type Offer = {
   id: string;
@@ -15,36 +16,6 @@ type Offer = {
   description: string;
   discount: number;
 };
-
-const dummyOffers: Offer[] = [
-  {
-    id: '1',
-    title: 'Weekend Sale on Fresh Produce',
-    store: 'Silpo',
-    validUntil: '2025-06-09',
-    image: 'placeholder',
-    description: 'Up to 30% off on fresh fruits and vegetables',
-    discount: 30,
-  },
-  {
-    id: '2',
-    title: 'Dairy Products Special',
-    store: 'ATB',
-    validUntil: '2025-06-07',
-    image: 'placeholder',
-    description: 'Buy 2 Get 1 Free on all dairy products',
-    discount: 33,
-  },
-  {
-    id: '3',
-    title: 'Meat & Poultry Discount',
-    store: 'Novus',
-    validUntil: '2025-06-05',
-    image: 'placeholder',
-    description: '25% off on selected meat products',
-    discount: 25,
-  },
-];
 
 const filterCategories = [
   'All',
@@ -57,11 +28,38 @@ const filterCategories = [
 
 export default function OffersScreen() {
   const [selectedFilter, setSelectedFilter] = useState('All');
+  const { products, loading, error } = useLatestProducts();
 
-  const OfferCard = ({ offer }: { offer: Offer }) => (
+  // Transform products to Offer-like objects for display
+  const offers = products.map((p) => ({
+    id: p.id.toString(),
+    title: p.name,
+    store: p.store,
+    validUntil: p.lastUpdated,
+    image: p.imageUrl || 'placeholder',
+    description: p.category,
+    discount: p.oldPrice && p.oldPrice > p.price ? Math.round(100 * (1 - p.price / p.oldPrice)) : 0,
+  }));
+
+  const filteredOffers = selectedFilter === 'All'
+    ? offers
+    : offers.filter((o) => o.description?.toLowerCase().includes(selectedFilter.toLowerCase()));
+
+  const OfferCard = ({ offer }: { offer: typeof offers[0] }) => (
     <TouchableOpacity style={styles.offerCard} accessibilityLabel={`View ${offer.title} offer details`}>
       <View style={styles.offerImageContainer}>
-        <View style={styles.offerImage} />
+        {offer.image && offer.image !== 'placeholder' ? (
+          <Image
+            source={{ uri: offer.image }}
+            style={styles.offerImage}
+            resizeMode="cover"
+            accessibilityLabel={`${offer.title} image`}
+          />
+        ) : (
+          <View style={[styles.offerImage, { backgroundColor: '#eee', justifyContent: 'center', alignItems: 'center' }]}> 
+            <Ionicons name="image-outline" size={40} color="#ccc" />
+          </View>
+        )}
         <View style={styles.discountTag}>
           <ThemedText style={styles.discountText}>{offer.discount}% OFF</ThemedText>
         </View>
@@ -131,13 +129,19 @@ export default function OffersScreen() {
           ))}
         </ScrollView>
 
-        <FlatList
-          data={dummyOffers}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <OfferCard offer={item} />}
-          contentContainerStyle={styles.offersList}
-          showsVerticalScrollIndicator={false}
-        />
+        {loading ? (
+          <ThemedText>Loading...</ThemedText>
+        ) : error ? (
+          <ThemedText style={{ color: 'red' }}>{error}</ThemedText>
+        ) : (
+          <FlatList
+            data={filteredOffers}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <OfferCard offer={item} />}
+            contentContainerStyle={styles.offersList}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
       </ThemedView>
     </ParallaxScrollView>
   );
