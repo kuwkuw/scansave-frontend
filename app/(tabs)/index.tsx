@@ -193,7 +193,8 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 16,
     color: '#333333',
-  },  searchContainer: {
+  },
+  searchContainer: {
     height: 48,
     marginHorizontal: 16,
     marginTop: 8,
@@ -247,7 +248,8 @@ const styles = StyleSheet.create({
   dealsScroll: {
     paddingHorizontal: 16,
     gap: 16,
-  },  dealCard: {
+  },
+  dealCard: {
     width: 200,
     height: 180,
     backgroundColor: '#FFFFFF',
