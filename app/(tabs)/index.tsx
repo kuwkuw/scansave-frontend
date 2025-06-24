@@ -6,21 +6,14 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  View
+  View,
+  Image as RNImage
 } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
+import { DealCard } from '@/components/cards/DealCard';
 import { ThemedView } from '@/components/ThemedView';
 
-type HotDeal = {
-  id: string;
-  title: string;
-  image: string;
-  currentPrice: number;
-  oldPrice: number;
-  store: string;
-  discount: number;
-};
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -30,35 +23,7 @@ type Category = {
   icon: IconName;
 };
 
-const dummyDeals: HotDeal[] = [
-  {
-    id: '1',
-    title: 'Fresh Milk 2.5%',
-    image: 'placeholder',
-    currentPrice: 49.99,
-    oldPrice: 59.99,
-    store: 'Silpo',
-    discount: 20,
-  },
-  {
-    id: '2',
-    title: 'Whole Grain Bread',
-    image: 'placeholder',
-    currentPrice: 29.99,
-    oldPrice: 39.99,
-    store: 'ATB',
-    discount: 25,
-  },
-  {
-    id: '3',
-    title: 'Free Range Eggs',
-    image: 'placeholder',
-    currentPrice: 69.99,
-    oldPrice: 89.99,
-    store: 'Novus',
-    discount: 15,
-  },
-];
+import { useHotDeals } from '@/hooks/useProducts';
 
 const categories: Category[] = [
   { id: '1', name: 'Dairy', icon: 'nutrition-outline' },
@@ -69,28 +34,9 @@ const categories: Category[] = [
 
 export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
+  const { products: hotDeals, loading, error } = useHotDeals({ minDiscount: 10, limit: 10 });
 
-  const DealCard = ({ deal }: { deal: HotDeal }) => (
-    <View style={styles.dealCard}>
-      <View style={styles.dealImageContainer}>
-        <View style={styles.dealImage} />
-        <View style={styles.dealTag}>
-          <ThemedText style={styles.dealTagText}>DEAL!</ThemedText>
-        </View>
-      </View>
-      <View style={styles.dealInfo}>
-        <View style={styles.priceContainer}>
-          <ThemedText style={styles.currentPrice}>
-            {deal.currentPrice.toFixed(2)} грн
-          </ThemedText>
-          <ThemedText style={styles.oldPrice}>
-            was {deal.oldPrice.toFixed(2)} грн
-          </ThemedText>
-        </View>
-        <ThemedText style={styles.storeName}>{deal.store}</ThemedText>
-      </View>
-    </View>
-  );
+  // Use Product[] directly from hotDeals
 
   return (
     <ThemedView style={styles.container}>
@@ -127,15 +73,23 @@ export default function HomeScreen() {
         {/* Hot Deals Section */}
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>🔥 Hot Deals Near You!</ThemedText>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.dealsScroll}
-          >
-            {dummyDeals.map((deal) => (
-              <DealCard key={deal.id} deal={deal} />
-            ))}
-          </ScrollView>
+          {loading ? (
+            <ThemedText>Loading...</ThemedText>
+          ) : error ? (
+            <ThemedText style={{ color: 'red' }}>{error}</ThemedText>
+          ) : hotDeals.length === 0 ? (
+            <ThemedText>No hot deals found.</ThemedText>
+          ) : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.dealsScroll}
+            >
+              {hotDeals.map((deal) => (
+                <DealCard key={deal.id} product={deal} />
+              ))}
+            </ScrollView>
+          )}
         </View>
 
         {/* Categories Section */}
