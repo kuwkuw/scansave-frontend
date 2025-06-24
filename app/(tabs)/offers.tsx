@@ -17,18 +17,16 @@ type Offer = {
   discount: number;
 };
 
-const filterCategories = [
-  'All',
-  'Groceries',
-  'Fresh Produce',
-  'Meat & Poultry',
-  'Dairy',
-  'Bakery',
-];
-
 export default function OffersScreen() {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const { products, loading, error } = useLatestProducts();
+
+  // Aggregate unique categories from products
+  const categorySet = new Set<string>();
+  products.forEach((p) => {
+    if (p.category) categorySet.add(p.category);
+  });
+  const filterCategories = ['All', ...Array.from(categorySet).sort()];
 
   // Transform products to Offer-like objects for display
   const offers = products.map((p) => ({
@@ -99,37 +97,33 @@ export default function OffersScreen() {
 
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#E8F5E9', dark: '#1B5E20' }}
+      headerBackgroundColor={{ light: '#E0F7FA', dark: '#263238' }}
       headerImage={
         <Ionicons
           name="pricetag"
-          size={310}
+          size={230}
           color="#00BFA5"
           style={styles.headerIcon}
         />
-      }>
+      }
+    >
       <ThemedView style={styles.container}>
-        <ThemedText type="title">Special Offers</ThemedText>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.filterScroll}
-          contentContainerStyle={styles.filterContainer}
-        >
+        <ThemedText type="title">Offers</ThemedText>
+        {/* Dynamic filter bar based on product categories */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterBar}>
           {filterCategories.map((category) => (
             <TouchableOpacity
               key={category}
               style={[
-                styles.filterPill,
-                selectedFilter === category && styles.filterPillActive,
+                styles.filterButton,
+                selectedFilter === category && styles.filterButtonActive,
               ]}
               onPress={() => setSelectedFilter(category)}
             >
               <ThemedText
                 style={[
-                  styles.filterText,
-                  selectedFilter === category && styles.filterTextActive,
+                  styles.filterButtonText,
+                  selectedFilter === category && styles.filterButtonTextActive,
                 ]}
               >
                 {category}
@@ -167,27 +161,26 @@ const styles = StyleSheet.create({
     position: 'absolute',
     opacity: 0.7,
   },
-  filterScroll: {
+  filterBar: {
     marginVertical: 16,
+    paddingHorizontal: 8,
+    flexGrow: 0,
   },
-  filterContainer: {
-    paddingHorizontal: 16,
-    gap: 8,
-  },
-  filterPill: {
+  filterButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     backgroundColor: '#F5F5F5',
+    marginRight: 8,
   },
-  filterPillActive: {
+  filterButtonActive: {
     backgroundColor: '#00BFA5',
   },
-  filterText: {
+  filterButtonText: {
     fontSize: 14,
     color: '#666666',
   },
-  filterTextActive: {
+  filterButtonTextActive: {
     color: '#FFFFFF',
     fontWeight: '600',
   },
