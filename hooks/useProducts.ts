@@ -25,6 +25,33 @@ export async function fetchProducts(): Promise<Product[]> {
 /**
  * Fetch latest products from the backend, optionally filtered by limit, category, and store.
  */
+export async function fetchHotDeals({ minDiscount = 10, limit = 10 }: { minDiscount?: number; limit?: number } = {}): Promise<Product[]> {
+  const params = new URLSearchParams();
+  if (minDiscount) params.append('minDiscount', minDiscount.toString());
+  if (limit) params.append('limit', limit.toString());
+  const baseUrl = Constants.expoConfig?.extra?.apiBaseUrl || 'http://localhost:3000';
+  const url = `${baseUrl}/products/hot-deals?${params.toString()}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch hot deals');
+  return res.json();
+}
+
+export function useHotDeals({ minDiscount = 10, limit = 10 }: { minDiscount?: number; limit?: number } = {}) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchHotDeals({ minDiscount, limit })
+      .then(setProducts)
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [minDiscount, limit]);
+
+  return { products, loading, error };
+}
+
 export async function fetchLatestProducts({ limit = 10, category, store }: { limit?: number; category?: string; store?: string } = {}): Promise<Product[]> {
   const params = new URLSearchParams();
   if (limit) params.append('limit', limit.toString());
