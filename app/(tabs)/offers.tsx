@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { FlatList, Platform, ScrollView, StyleSheet, TouchableOpacity, View, Image } from 'react-native';
+import { FlatList, Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -45,8 +45,14 @@ export default function OffersScreen() {
     ? offers
     : offers.filter((o) => o.description?.toLowerCase().includes(selectedFilter.toLowerCase()));
 
+  const { useRouter } = require('expo-router');
+  const router = useRouter();
   const OfferCard = ({ offer }: { offer: typeof offers[0] }) => (
-    <TouchableOpacity style={styles.offerCard} accessibilityLabel={`View ${offer.title} offer details`}>
+    <TouchableOpacity
+      style={styles.offerCard}
+      accessibilityLabel={`View ${offer.title} offer details`}
+      onPress={() => router.push(`/product-details/${offer.id}`)}
+    >
       <View style={styles.offerImageContainer}>
         {offer.image && offer.image !== 'placeholder' ? (
           <Image
@@ -81,7 +87,10 @@ export default function OffersScreen() {
         <ThemedText style={styles.description} numberOfLines={2}>
           {offer.description}
         </ThemedText>
-        <TouchableOpacity style={styles.viewButton}>
+        <TouchableOpacity
+          style={styles.viewButton}
+          onPress={() => router.push(`/product-details/${offer.id}`)}
+        >
           <ThemedText style={styles.viewButtonText}>View Details</ThemedText>
         </TouchableOpacity>
       </View>
