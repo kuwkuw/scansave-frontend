@@ -62,6 +62,29 @@ A React Native mobile app that helps users find the best deals across different 
 - 🗺️ View store locations and get directions
 - 👤 Personalized user profiles and preferences
 
+## Environment Configuration
+
+This project supports multiple environments (development, production) using Expo's config system and environment variables.
+
+- **.env.development**: Local/dev API settings (e.g., `API_BASE_URL=http://localhost:3000`)
+- **.env.production**: Production API settings (e.g., `API_BASE_URL=https://api.scansave.com`)
+- **app.config.dev.js**: Expo config for development (loads `.env.development`)
+- **app.config.prod.js**: Expo config for production (loads `.env.production`)
+
+### Running in Development
+
+```bash
+npx expo start --config app.config.dev.js
+```
+
+### Running in Production/Preview
+
+```bash
+npx expo start --config app.config.prod.js
+```
+
+Your API base URL will be injected automatically based on the environment.
+
 ## Getting Started
 
 1. Install dependencies:
@@ -70,10 +93,10 @@ A React Native mobile app that helps users find the best deals across different 
 npm install
 ```
 
-2. Start the development server:
+2. Start the development server (see above for multi-env):
 
 ```bash
-npx expo start
+npx expo start --config app.config.dev.js
 ```
 
 ## Running the App
@@ -106,14 +129,57 @@ app/
   (tabs)/              # Tab-based navigation screens
     home.tsx           # Main dashboard
     search.tsx         # Product search and comparison
-    list.tsx          # Shopping list management
-    offers.tsx        # Deals and promotions
-    profile.tsx       # User profile and settings
+    list.tsx           # Shopping list management
+    offers.tsx         # Deals and promotions
+    profile.tsx        # User profile and settings
 components/           # Reusable UI components
 constants/           # App-wide constants
 hooks/              # Custom React hooks
 assets/             # Images, fonts, and other static files
 ```
+
+## File-based Routing Example
+
+This project uses [Expo Router](https://docs.expo.dev/router/introduction/) for file-based navigation. To add a new tab or screen:
+
+- Add a new file to `app/(tabs)/` (e.g., `deals.tsx` for a new Deals tab)
+- The filename becomes the route name (e.g., `/deals`)
+- For dynamic routes (e.g., product details), use bracket notation: `app/product-details/[productId].tsx`
+
+## Custom Hooks Overview
+
+- `useProducts` and `useLatestProducts`: Fetch and manage product data from the backend.
+- `useColorScheme`: Detects light/dark mode.
+- `useThemeColor`: Provides theme-aware color values for components.
+
+## Theming & UI Conventions
+
+- Use `ThemedText` and `ThemedView` for all text and view elements to ensure light/dark mode support.
+- Use icons from `@expo/vector-icons`.
+- Place reusable UI primitives in `components/ui/`.
+- Style components using React Native's `StyleSheet.create` and follow the naming conventions in existing files.
+
+## API Usage Example
+
+All API calls should use the environment-configured base URL:
+
+```ts
+import Constants from 'expo-constants';
+const baseUrl = Constants.expoConfig?.extra?.apiBaseUrl;
+fetch(`${baseUrl}/products`);
+```
+
+## Adding New Features or Screens
+
+1. Create a new file in the appropriate folder (e.g., `app/(tabs)/newfeature.tsx` for a new tab).
+2. Use the provided hooks and theming components.
+3. Add navigation as needed using Expo Router conventions.
+4. Test on both iOS and Android.
+
+## .gitignore & Security
+
+- `.env.development` and `.env.production` should **not** contain secrets in production or be committed with sensitive values.
+- Make sure `.env*` files are listed in `.gitignore` if you store secrets locally.
 
 ## Technology Stack
 
