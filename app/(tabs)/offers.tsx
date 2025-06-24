@@ -3,19 +3,11 @@ import { useState } from 'react';
 import { FlatList, Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { OfferCard, Offer } from '@/components/cards/OfferCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useLatestProducts } from '@/hooks/useProducts';
 
-type Offer = {
-  id: string;
-  title: string;
-  store: string;
-  validUntil: string;
-  image: string;
-  description: string;
-  discount: number;
-};
 
 export default function OffersScreen() {
   const [selectedFilter, setSelectedFilter] = useState('All');
@@ -45,55 +37,6 @@ export default function OffersScreen() {
 
   const { useRouter } = require('expo-router');
   const router = useRouter();
-  const OfferCard = ({ offer }: { offer: typeof offers[0] }) => (
-    <TouchableOpacity
-      style={styles.offerCard}
-      accessibilityLabel={`View ${offer.title} offer details`}
-      onPress={() => router.push(`/product-details/${offer.id}`)}
-    >
-      <View style={styles.offerImageContainer}>
-        {offer.image && offer.image !== 'placeholder' ? (
-          <Image
-            source={{ uri: offer.image }}
-            style={styles.offerImage}
-            resizeMode="cover"
-            accessibilityLabel={`${offer.title} image`}
-          />
-        ) : (
-          <View style={[styles.offerImage, { backgroundColor: '#eee', justifyContent: 'center', alignItems: 'center' }]}> 
-            <Ionicons name="image-outline" size={40} color="#ccc" />
-          </View>
-        )}
-        <View style={styles.discountTag}>
-          <ThemedText style={styles.discountText}>{offer.discount}% OFF</ThemedText>
-        </View>
-      </View>
-      <View style={styles.offerInfo}>
-        <ThemedText style={styles.offerTitle}>{offer.title}</ThemedText>
-        <View style={styles.offerMeta}>
-          <View style={styles.storeInfo}>
-            <Ionicons name="business-outline" size={16} color="#666666" />
-            <ThemedText style={styles.storeText}>{offer.store}</ThemedText>
-          </View>
-          <View style={styles.validityInfo}>
-            <Ionicons name="time-outline" size={16} color="#666666" />
-            <ThemedText style={styles.validityText}>
-              Until {new Date(offer.validUntil).toLocaleDateString()}
-            </ThemedText>
-          </View>
-        </View>
-        <ThemedText style={styles.description} numberOfLines={2}>
-          {offer.description}
-        </ThemedText>
-        <TouchableOpacity
-          style={styles.viewButton}
-          onPress={() => router.push(`/product-details/${offer.id}`)}
-        >
-          <ThemedText style={styles.viewButtonText}>View Details</ThemedText>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  );
 
   return (
     <ParallaxScrollView
@@ -140,7 +83,9 @@ export default function OffersScreen() {
           <FlatList
             data={filteredOffers}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <OfferCard offer={item} />}
+            renderItem={({ item }) => (
+              <OfferCard offer={item} onPress={(id) => router.push(`/product-details/${id}`)} />
+            )}
             contentContainerStyle={styles.offersList}
             showsVerticalScrollIndicator={false}
           />
