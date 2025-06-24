@@ -13,8 +13,11 @@ export interface Product {
   productUrl: string;
 }
 
+import Constants from 'expo-constants';
+
 export async function fetchProducts(): Promise<Product[]> {
-  const res = await fetch('http://localhost:3000/products');
+  const baseUrl = Constants.expoConfig?.extra?.apiBaseUrl;
+  const res = await fetch(`${baseUrl}/products`);
   if (!res.ok) throw new Error('Failed to fetch products');
   return res.json();
 }
@@ -27,7 +30,8 @@ export async function fetchLatestProducts({ limit = 10, category, store }: { lim
   if (limit) params.append('limit', limit.toString());
   if (category) params.append('category', category);
   if (store) params.append('store', store);
-  const url = `http://localhost:3000/products/latest?${params.toString()}`;
+  const baseUrl = Constants.expoConfig?.extra?.apiBaseUrl || 'http://localhost:3000';
+  const url = `${baseUrl}/products/latest?${params.toString()}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error('Failed to fetch latest products');
   return res.json();
