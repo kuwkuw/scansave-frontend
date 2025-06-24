@@ -24,6 +24,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      initialRouteName="index"
       screenOptions={{
         headerShown: false,
         tabBarButton: HapticTab,
@@ -32,7 +33,6 @@ export default function TabLayout() {
         tabBarInactiveTintColor: INACTIVE_COLOR,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabBarLabel,
-        initialRouteName: "index"
       }}>
       <Tabs.Screen
         name="home"
