@@ -32,7 +32,7 @@ export default function TabLayout() {
         tabBarInactiveTintColor: INACTIVE_COLOR,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabBarLabel,
-        initialRouteName: "home"
+        initialRouteName: "index"
       }}>
       <Tabs.Screen
         name="home"

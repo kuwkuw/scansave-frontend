@@ -5,6 +5,8 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useLatestProducts } from '@/hooks/useProducts';
 
+import { Stack } from 'expo-router';
+
 export default function ProductDetailsScreen() {
   const { productId } = useLocalSearchParams();
   const { products } = useLatestProducts();
@@ -19,29 +21,32 @@ export default function ProductDetailsScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.imageContainer}>
-        {product.imageUrl ? (
-          <Image source={{ uri: product.imageUrl }} style={styles.image} resizeMode="cover" />
-        ) : (
-          <View style={[styles.image, styles.placeholder]}>
-            <Ionicons name="image-outline" size={60} color="#ccc" />
-          </View>
-        )}
-      </View>
-      <View style={styles.card}>
-        <ThemedText style={styles.title}>{product.name}</ThemedText>
-        <View style={styles.priceRow}>
-          <ThemedText style={styles.price}>{typeof product.price === 'number' ? product.price.toFixed(2) : product.price} грн</ThemedText>
-          {typeof product.oldPrice === 'number' && product.oldPrice > (typeof product.price === 'number' ? product.price : 0) && (
-            <ThemedText style={styles.oldPrice}>Was {product.oldPrice.toFixed(2)} грн</ThemedText>
+    <>
+      <Stack.Screen options={{ title: 'Product Details' }} />
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.imageContainer}>
+          {product.imageUrl ? (
+            <Image source={{ uri: product.imageUrl }} style={styles.image} resizeMode="cover" />
+          ) : (
+            <View style={[styles.image, styles.placeholder]}>
+              <Ionicons name="image-outline" size={60} color="#ccc" />
+            </View>
           )}
         </View>
-        <ThemedText style={styles.store}>Store: {product.store}</ThemedText>
-        <ThemedText style={styles.category}>Category: {product.category}</ThemedText>
-        <ThemedText style={styles.description}>{typeof (product as any).description === 'string' && (product as any).description ? (product as any).description : 'No description.'}</ThemedText>
-      </View>
-    </ScrollView>
+        <View style={styles.card}>
+          <ThemedText style={styles.title}>{product.name}</ThemedText>
+          <View style={styles.priceRow}>
+            <ThemedText style={styles.price}>{typeof product.price === 'number' ? product.price.toFixed(2) : product.price} грн</ThemedText>
+            {typeof product.oldPrice === 'number' && product.oldPrice > (typeof product.price === 'number' ? product.price : 0) && (
+              <ThemedText style={styles.oldPrice}>Was {product.oldPrice.toFixed(2)} грн</ThemedText>
+            )}
+          </View>
+          <ThemedText style={styles.store}>Store: {product.store}</ThemedText>
+          <ThemedText style={styles.category}>Category: {product.category}</ThemedText>
+          <ThemedText style={styles.description}>{typeof (product as any).description === 'string' && (product as any).description ? (product as any).description : 'No description.'}</ThemedText>
+        </View>
+      </ScrollView>
+    </>
   );
 }
 
