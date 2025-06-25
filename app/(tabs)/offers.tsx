@@ -82,6 +82,13 @@ export default function OffersScreen() {
           </View>
         ) : error ? (
           <ThemedText style={{ color: 'red' }}>{error}</ThemedText>
+        ) : products.length === 0 ? (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 48 }}>
+            <Ionicons name="pricetag-outline" size={64} color="#B0BEC5" style={{ marginBottom: 16 }} />
+            <ThemedText style={{ color: '#888', fontSize: 18, textAlign: 'center' }}>
+              No offers found for this filter.
+            </ThemedText>
+          </View>
         ) : (
           <FlatList
             data={offers}
