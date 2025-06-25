@@ -18,7 +18,7 @@ interface OfferCardProps {
   onPress: (id: string) => void;
 }
 
-export const OfferCard: React.FC<OfferCardProps> = ({ offer, onPress }) => {
+export const OfferCard = React.memo<OfferCardProps>(({ offer, onPress }) => {
   return (
     <TouchableOpacity
       style={styles.offerCard}
@@ -68,7 +68,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, onPress }) => {
       </View>
     </TouchableOpacity>
   );
-};
+});
 
 const styles = StyleSheet.create({
   offerCard: {
