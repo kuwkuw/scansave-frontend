@@ -201,8 +201,9 @@ export function usePaginatedOffers({ limit = 20, category, store }: { limit?: nu
   };
 
   useEffect(() => {
-    setIsInitialLoading(true);
+    setProducts([]);
     setOffset(0);
+    setIsInitialLoading(true);
     fetchPaginatedOffers({ limit, offset: 0, category, store })
       .then((result) => {
         setProducts(result.products);
