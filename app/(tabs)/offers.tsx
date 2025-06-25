@@ -6,15 +6,15 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { OfferCard, Offer } from '@/components/cards/OfferCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useLatestProducts, useCategories } from '@/hooks/useProducts';
+import { usePaginatedOffers, useCategories } from '@/hooks/useProducts';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useOffersFilter } from '../../context/OffersFilterContext';
 
 
 export default function OffersScreen() {
   const { selectedFilter, setSelectedFilter } = useOffersFilter();
-  const { products, loading, error } = useLatestProducts({
-    limit: 100,
+  const { products, total, isInitialLoading, isFetchingMore, error, fetchMore, refreshing, refresh } = usePaginatedOffers({
+    limit: 20,
     category: selectedFilter !== 'All' ? selectedFilter : undefined,
   });
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
@@ -55,28 +55,28 @@ export default function OffersScreen() {
             <ThemedText style={{ color: 'red' }}>{categoriesError}</ThemedText>
           ) : (
             filterCategories.map((category) => (
-              <TouchableOpacity
-                key={category}
+            <TouchableOpacity
+              key={category}
+              style={[
+                styles.filterButton,
+                selectedFilter === category && styles.filterButtonActive,
+              ]}
+              onPress={() => setSelectedFilter(category)}
+            >
+              <ThemedText
                 style={[
-                  styles.filterButton,
-                  selectedFilter === category && styles.filterButtonActive,
+                  styles.filterButtonText,
+                  selectedFilter === category && styles.filterButtonTextActive,
                 ]}
-                onPress={() => setSelectedFilter(category)}
               >
-                <ThemedText
-                  style={[
-                    styles.filterButtonText,
-                    selectedFilter === category && styles.filterButtonTextActive,
-                  ]}
-                >
-                  {category}
-                </ThemedText>
-              </TouchableOpacity>
+                {category}
+              </ThemedText>
+            </TouchableOpacity>
             ))
           )}
         </ScrollView>
 
-        {loading ? (
+        {isInitialLoading && products.length === 0 ? (
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 32 }}>
             <ActivityIndicator size="large" color="#00BFA5" />
           </View>
@@ -91,6 +91,11 @@ export default function OffersScreen() {
             )}
             contentContainerStyle={styles.offersList}
             showsVerticalScrollIndicator={false}
+            onEndReached={fetchMore}
+            onEndReachedThreshold={0.5}
+            refreshing={refreshing}
+            onRefresh={refresh}
+            ListFooterComponent={isFetchingMore ? <ActivityIndicator size="small" color="#00BFA5" style={{ marginVertical: 16 }} /> : null}
           />
         )}
       </ThemedView>

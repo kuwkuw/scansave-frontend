@@ -30,7 +30,7 @@ export default function TabLayout() {
 
   useEffect(() => {
     if (pathname === '/(tabs)') {
-      resetFilter();
+    resetFilter();
     }
   }, [pathname, resetFilter]);
 

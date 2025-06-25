@@ -33,7 +33,7 @@ export default function SearchScreen() {
           resizeMode="cover"
         />
       ) : (
-        <View style={styles.productImage} />
+      <View style={styles.productImage} />
       )}
       <View style={styles.productInfo}>
         <ThemedText style={styles.productName}>{product.name}</ThemedText>
@@ -111,13 +111,13 @@ export default function SearchScreen() {
       ) : products.length === 0 && shouldSearch ? (
         <ThemedText>No products found.</ThemedText>
       ) : (
-        <FlatList
+      <FlatList
           data={products}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <ProductCard product={item} />}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-        />
+        renderItem={({ item }) => <ProductCard product={item} />}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+      />
       )}
     </ThemedView>
   );

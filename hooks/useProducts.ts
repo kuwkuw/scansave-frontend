@@ -149,3 +149,94 @@ export function useSearchProducts(query: string) {
   return { products, loading, error };
 }
 
+export async function fetchPaginatedOffers({ limit = 20, offset = 0, category, store }: { limit?: number; offset?: number; category?: string; store?: string } = {}): Promise<{ products: Product[]; total: number }> {
+  const params = new URLSearchParams();
+  if (limit) params.append('limit', limit.toString());
+  if (offset) params.append('offset', offset.toString());
+  if (category) params.append('category', category);
+  if (store) params.append('store', store);
+  const baseUrl = Constants.expoConfig?.extra?.apiBaseUrl || 'http://localhost:3000';
+  const url = `${baseUrl}/products/offers?${params.toString()}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch paginated offers');
+  return res.json();
+}
+
+export function usePaginatedOffers({ limit = 20, category, store }: { limit?: number; category?: string; store?: string } = {}) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [total, setTotal] = useState(0);
+  const [offset, setOffset] = useState(0);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchMore = async () => {
+    if (isFetchingMore || products.length >= total) return;
+    setIsFetchingMore(true);
+    try {
+      const result = await fetchPaginatedOffers({ limit, offset: products.length, category, store });
+      setProducts((prev) => [...prev, ...result.products]);
+      setTotal(result.total);
+      setOffset(products.length + result.products.length);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setIsFetchingMore(false);
+    }
+  };
+
+  const refresh = async () => {
+    setRefreshing(true);
+    setOffset(0);
+    try {
+      const result = await fetchPaginatedOffers({ limit, offset: 0, category, store });
+      setProducts(result.products);
+      setTotal(result.total);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    setIsInitialLoading(true);
+    setOffset(0);
+    fetchPaginatedOffers({ limit, offset: 0, category, store })
+      .then((result) => {
+        setProducts(result.products);
+        setTotal(result.total);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setIsInitialLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [limit, category, store]);
+
+  return { products, total, isInitialLoading, isFetchingMore, error, fetchMore, refreshing, refresh };
+}
+
+export async function fetchProductById(id: string | number): Promise<Product> {
+  const baseUrl = Constants.expoConfig?.extra?.apiBaseUrl || 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/products/${id}`);
+  if (!res.ok) throw new Error('Failed to fetch product');
+  return res.json();
+}
+
+export function useProductById(id?: string | number) {
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    fetchProductById(id)
+      .then(setProduct)
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  return { product, loading, error };
+}
+

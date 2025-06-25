@@ -3,14 +3,33 @@ import { useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View, Image, ScrollView, Platform } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useLatestProducts } from '@/hooks/useProducts';
+import { useProductById } from '@/hooks/useProducts';
+import React from 'react';
 
 import { Stack } from 'expo-router';
 
 export default function ProductDetailsScreen() {
   const { productId } = useLocalSearchParams();
-  const { products } = useLatestProducts();
-  const product = products.find((p) => p.id.toString() === productId);
+  let id: string | number | undefined = undefined;
+  if (typeof productId === 'string') id = productId;
+  else if (Array.isArray(productId) && productId.length > 0) id = productId[0];
+  const { product, loading, error } = useProductById(id);
+
+  if (loading) {
+    return (
+      <ThemedView style={styles.container}>
+        <ThemedText>Loading...</ThemedText>
+      </ThemedView>
+    );
+  }
+
+  if (error) {
+    return (
+      <ThemedView style={styles.container}>
+        <ThemedText style={styles.notFound}>Error: {error}</ThemedText>
+      </ThemedView>
+    );
+  }
 
   if (!product) {
     return (

@@ -100,20 +100,20 @@ export default function HomeScreen() {
               <ThemedText style={{ color: 'red' }}>{categoriesError}</ThemedText>
             ) : (
               categories.map((category) => (
-                <TouchableOpacity
+              <TouchableOpacity
                   key={category}
-                  style={styles.categoryButton}
+                style={styles.categoryButton}
                   accessibilityLabel={`Browse ${category} category`}
                   onPress={() => {
                     setSelectedFilter(category);
                     router.push('/offers');
                   }}
-                >
-                  <View style={styles.categoryIcon}>
+              >
+                <View style={styles.categoryIcon}>
                     <Ionicons name="pricetag-outline" size={28} color="#00BFA5" />
-                  </View>
+                </View>
                   <ThemedText style={styles.categoryText}>{category}</ThemedText>
-                </TouchableOpacity>
+              </TouchableOpacity>
               ))
             )}
           </View>
