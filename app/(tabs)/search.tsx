@@ -8,7 +8,9 @@ import {
     TouchableOpacity,
     View,
     ActivityIndicator,
+    Image,
 } from 'react-native';
+import { router } from 'expo-router';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -24,12 +26,20 @@ export default function SearchScreen() {
 
   const ProductCard = ({ product }: { product: any }) => (
     <View style={styles.productCard}>
-      <View style={styles.productImage} />
+      {product.imageUrl ? (
+        <Image
+          source={{ uri: product.imageUrl }}
+          style={styles.productImage}
+          resizeMode="cover"
+        />
+      ) : (
+        <View style={styles.productImage} />
+      )}
       <View style={styles.productInfo}>
         <ThemedText style={styles.productName}>{product.name}</ThemedText>
         <View style={styles.priceRow}>
           <ThemedText style={styles.bestPrice}>
-            {Number(product.price).toFixed(2)} грн
+            {product.price} грн
           </ThemedText>
           {product.store && (
             <ThemedText style={styles.bestStore}> at {product.store}</ThemedText>
@@ -57,6 +67,7 @@ export default function SearchScreen() {
         <TouchableOpacity
           style={styles.backButton}
           accessibilityLabel="Go back"
+          onPress={() => router.back()}
         >
           <Ionicons name="arrow-back-outline" size={24} color="#333333" />
         </TouchableOpacity>
