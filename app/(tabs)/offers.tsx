@@ -114,6 +114,11 @@ export default function OffersScreen() {
             refreshing={refreshing}
             onRefresh={refresh}
             ListFooterComponent={isFetchingMore ? <ActivityIndicator size="small" color="#00BFA5" style={{ marginVertical: 16 }} /> : null}
+            initialNumToRender={8}
+            windowSize={10}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={8}
+            updateCellsBatchingPeriod={50}
           />
         )}
       </ThemedView>
