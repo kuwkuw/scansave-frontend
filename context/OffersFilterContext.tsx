@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react';
+import debounce from 'lodash/debounce';
 
 interface OffersFilterContextProps {
   selectedFilter: string;
@@ -9,7 +10,9 @@ interface OffersFilterContextProps {
 const OffersFilterContext = createContext<OffersFilterContextProps | undefined>(undefined);
 
 export const OffersFilterProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedFilter, setSelectedFilter] = useState<string>('All');
+  const [selectedFilter, setSelectedFilterRaw] = useState<string>('All');
+  // Debounce the setter
+  const setSelectedFilter = useMemo(() => debounce(setSelectedFilterRaw, 300), []);
   const resetFilter = () => setSelectedFilter('All');
   return (
     <OffersFilterContext.Provider value={{ selectedFilter, setSelectedFilter, resetFilter }}>
