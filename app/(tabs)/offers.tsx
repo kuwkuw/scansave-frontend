@@ -81,7 +81,18 @@ export default function OffersScreen() {
             <ActivityIndicator size="large" color="#00BFA5" />
           </View>
         ) : error ? (
-          <ThemedText style={{ color: 'red' }}>{error}</ThemedText>
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 48 }}>
+            <Ionicons name="alert-circle-outline" size={64} color="#FF7043" style={{ marginBottom: 16 }} />
+            <ThemedText style={{ color: '#FF7043', fontSize: 18, textAlign: 'center', marginBottom: 12 }}>
+              {error}
+            </ThemedText>
+            <TouchableOpacity
+              style={{ backgroundColor: '#00BFA5', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 20 }}
+              onPress={refresh}
+            >
+              <ThemedText style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Retry</ThemedText>
+            </TouchableOpacity>
+          </View>
         ) : products.length === 0 ? (
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 48 }}>
             <Ionicons name="pricetag-outline" size={64} color="#B0BEC5" style={{ marginBottom: 16 }} />
