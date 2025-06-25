@@ -122,3 +122,30 @@ export function useCategories() {
   return { categories, loading, error };
 }
 
+export async function fetchSearchProducts(query: string): Promise<Product[]> {
+  const baseUrl = Constants.expoConfig?.extra?.apiBaseUrl || 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/products/search?query=${encodeURIComponent(query)}`);
+  if (!res.ok) throw new Error('Failed to fetch search results');
+  return res.json();
+}
+
+export function useSearchProducts(query: string) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!query) {
+      setProducts([]);
+      return;
+    }
+    setLoading(true);
+    fetchSearchProducts(query)
+      .then(setProducts)
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [query]);
+
+  return { products, loading, error };
+}
+

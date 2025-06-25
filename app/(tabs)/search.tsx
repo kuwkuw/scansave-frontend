@@ -7,63 +7,37 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    ActivityIndicator,
 } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-
-type Product = {
-  id: string;
-  name: string;
-  image: string;
-  bestPrice: number;
-  bestStore: string;
-  storeCount: number;
-};
-
-const dummyProducts: Product[] = [
-  {
-    id: '1',
-    name: 'Zlagoda Milk 2.5%, 1L',
-    image: 'placeholder',
-    bestPrice: 49.9,
-    bestStore: 'ATB',
-    storeCount: 3,
-  },
-  {
-    id: '2',
-    name: 'Prostokvashino Milk 2.5%, 870ml',
-    image: 'placeholder',
-    bestPrice: 52.5,
-    bestStore: 'Silpo',
-    storeCount: 4,
-  },
-  {
-    id: '3',
-    name: 'Ferma Milk 2.5%, 900ml',
-    image: 'placeholder',
-    bestPrice: 51.9,
-    bestStore: 'Novus',
-    storeCount: 2,
-  },
-];
+import { useSearchProducts } from '@/hooks/useProducts';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function SearchScreen() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedQuery = useDebounce(searchQuery, 300);
   const [sortBy, setSortBy] = useState('price_asc');
+  const shouldSearch = debouncedQuery.length >= 3;
+  const { products, loading, error } = useSearchProducts(shouldSearch ? debouncedQuery : '');
 
-  const ProductCard = ({ product }: { product: Product }) => (
+  const ProductCard = ({ product }: { product: any }) => (
     <View style={styles.productCard}>
       <View style={styles.productImage} />
       <View style={styles.productInfo}>
         <ThemedText style={styles.productName}>{product.name}</ThemedText>
         <View style={styles.priceRow}>
           <ThemedText style={styles.bestPrice}>
-            {product.bestPrice.toFixed(2)} грн
+            {Number(product.price).toFixed(2)} грн
           </ThemedText>
-          <ThemedText style={styles.bestStore}> at {product.bestStore}</ThemedText>
-        </View>        <TouchableOpacity>
+          {product.store && (
+            <ThemedText style={styles.bestStore}> at {product.store}</ThemedText>
+          )}
+        </View>
+        <TouchableOpacity>
           <ThemedText style={styles.compareLink}>
-            Compare {product.storeCount} stores
+            {product.store ? `Store: ${product.store}` : ''}
           </ThemedText>
         </TouchableOpacity>
       </View>
@@ -90,9 +64,11 @@ export default function SearchScreen() {
           <Ionicons name="search-outline" size={20} color="#666666" />
           <TextInput
             style={styles.input}
-            placeholder="Milk"
+            placeholder="Search for products..."
             placeholderTextColor="#999999"
-            editable={false}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            editable={true}
           />
         </View>
         <TouchableOpacity
@@ -113,13 +89,25 @@ export default function SearchScreen() {
       </View>
 
       {/* Product List */}
-      <FlatList
-        data={dummyProducts}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <ProductCard product={item} />}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {searchQuery.length > 0 && searchQuery.length < 3 ? (
+        <ThemedText>Enter at least 3 characters to search.</ThemedText>
+      ) : loading ? (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 32 }}>
+          <ActivityIndicator size="large" color="#00BFA5" />
+        </View>
+      ) : error ? (
+        <ThemedText style={{ color: 'red' }}>{error}</ThemedText>
+      ) : products.length === 0 && shouldSearch ? (
+        <ThemedText>No products found.</ThemedText>
+      ) : (
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => <ProductCard product={item} />}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </ThemedView>
   );
 }
