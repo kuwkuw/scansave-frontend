@@ -99,3 +99,25 @@ export function useLatestProducts({ limit = 10, category, store }: { limit?: num
   return { products, loading, error };
 }
 
+export async function fetchCategories(): Promise<string[]> {
+  const baseUrl = Constants.expoConfig?.extra?.apiBaseUrl || 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/products/categories`);
+  if (!res.ok) throw new Error('Failed to fetch categories');
+  return res.json();
+}
+
+export function useCategories() {
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchCategories()
+      .then(setCategories)
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { categories, loading, error };
+}
+

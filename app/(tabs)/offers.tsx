@@ -1,24 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { FlatList, Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { OfferCard, Offer } from '@/components/cards/OfferCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useLatestProducts } from '@/hooks/useProducts';
+import { useLatestProducts, useCategories } from '@/hooks/useProducts';
+import { useLocalSearchParams, router } from 'expo-router';
+import { useOffersFilter } from '../../context/OffersFilterContext';
 
 
 export default function OffersScreen() {
-  const [selectedFilter, setSelectedFilter] = useState('All');
-  const { products, loading, error } = useLatestProducts();
+  const { selectedFilter, setSelectedFilter } = useOffersFilter();
+  const { products, loading, error } = useLatestProducts({limit: 100});
+  const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
 
-  // Aggregate unique categories from products
-  const categorySet = new Set<string>();
-  products.forEach((p) => {
-    if (p.category) categorySet.add(p.category);
-  });
-  const filterCategories = ['All', ...Array.from(categorySet).sort()];
+  // Aggregate unique categories from products (replaced by backend categories)
+  const filterCategories = ['All', ...categories];
 
   // Transform products to Offer-like objects for display
   const offers = products.map((p) => ({
@@ -33,10 +32,9 @@ export default function OffersScreen() {
 
   const filteredOffers = selectedFilter === 'All'
     ? offers
-    : offers.filter((o) => o.description?.toLowerCase().includes(selectedFilter.toLowerCase()));
+    : offers.filter((o) => o.description === selectedFilter);
 
-  const { useRouter } = require('expo-router');
-  const router = useRouter();
+  
 
   return (
     <ParallaxScrollView
@@ -54,25 +52,31 @@ export default function OffersScreen() {
         <ThemedText type="title">Offers</ThemedText>
         {/* Dynamic filter bar based on product categories */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterBar}>
-          {filterCategories.map((category) => (
-            <TouchableOpacity
-              key={category}
-              style={[
-                styles.filterButton,
-                selectedFilter === category && styles.filterButtonActive,
-              ]}
-              onPress={() => setSelectedFilter(category)}
-            >
-              <ThemedText
+          {categoriesLoading ? (
+            <ThemedText>Loading...</ThemedText>
+          ) : categoriesError ? (
+            <ThemedText style={{ color: 'red' }}>{categoriesError}</ThemedText>
+          ) : (
+            filterCategories.map((category) => (
+              <TouchableOpacity
+                key={category}
                 style={[
-                  styles.filterButtonText,
-                  selectedFilter === category && styles.filterButtonTextActive,
+                  styles.filterButton,
+                  selectedFilter === category && styles.filterButtonActive,
                 ]}
+                onPress={() => setSelectedFilter(category)}
               >
-                {category}
-              </ThemedText>
-            </TouchableOpacity>
-          ))}
+                <ThemedText
+                  style={[
+                    styles.filterButtonText,
+                    selectedFilter === category && styles.filterButtonTextActive,
+                  ]}
+                >
+                  {category}
+                </ThemedText>
+              </TouchableOpacity>
+            ))
+          )}
         </ScrollView>
 
         {loading ? (

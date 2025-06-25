@@ -19,8 +19,18 @@ export type TabParamList = {
   profile: undefined;
 };
 
+import { useOffersFilter } from '../../context/OffersFilterContext';
+import { useEffect } from 'react';
+import { usePathname } from 'expo-router';
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { resetFilter } = useOffersFilter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    resetFilter();
+  }, [pathname]);
 
   return (
     <Tabs

@@ -1,4 +1,10 @@
+import { DealCard } from '@/components/cards/DealCard';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import { useOffersFilter } from '@/context/OffersFilterContext';
+import { useHotDeals, useCategories } from '@/hooks/useProducts';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import {
   Platform,
@@ -6,37 +12,26 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  View,
-  Image as RNImage
+  View
 } from 'react-native';
 
-import { ThemedText } from '@/components/ThemedText';
-import { DealCard } from '@/components/cards/DealCard';
-import { ThemedView } from '@/components/ThemedView';
-
-
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
-
 type Category = {
   id: string;
   name: string;
   icon: IconName;
 };
 
-import { useHotDeals } from '@/hooks/useProducts';
-
-const categories: Category[] = [
-  { id: '1', name: 'Dairy', icon: 'nutrition-outline' },
-  { id: '2', name: 'Meat', icon: 'restaurant-outline' },
-  { id: '3', name: 'Produce', icon: 'leaf-outline' },
-  { id: '4', name: 'Bakery', icon: 'pizza-outline' },
-];
-
 export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const { products: hotDeals, loading, error } = useHotDeals({ minDiscount: 10, limit: 10 });
+  const { selectedFilter, setSelectedFilter } = useOffersFilter();
+  const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
 
-  // Use Product[] directly from hotDeals
+  // Filter hotDeals by selectedFilter, if not 'All'
+  const filteredDeals = selectedFilter === 'All'
+    ? hotDeals
+    : hotDeals.filter((deal) => deal.category === selectedFilter);
 
   return (
     <ThemedView style={styles.container}>
@@ -85,7 +80,7 @@ export default function HomeScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.dealsScroll}
             >
-              {hotDeals.map((deal) => (
+              {filteredDeals.map((deal) => (
                 <DealCard key={deal.id} product={deal} />
               ))}
             </ScrollView>
@@ -96,18 +91,28 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Browse Categories</ThemedText>
           <View style={styles.categoriesContainer}>
-            {categories.map((category) => (
-              <TouchableOpacity
-                key={category.id}
-                style={styles.categoryButton}
-                accessibilityLabel={`Browse ${category.name} category`}
-              >
-                <View style={styles.categoryIcon}>
-                  <Ionicons name={category.icon} size={28} color="#00BFA5" />
-                </View>
-                <ThemedText style={styles.categoryText}>{category.name}</ThemedText>
-              </TouchableOpacity>
-            ))}
+            {categoriesLoading ? (
+              <ThemedText>Loading...</ThemedText>
+            ) : categoriesError ? (
+              <ThemedText style={{ color: 'red' }}>{categoriesError}</ThemedText>
+            ) : (
+              categories.map((category) => (
+                <TouchableOpacity
+                  key={category}
+                  style={styles.categoryButton}
+                  accessibilityLabel={`Browse ${category} category`}
+                  onPress={() => {
+                    setSelectedFilter(category);
+                    router.push('/offers');
+                  }}
+                >
+                  <View style={styles.categoryIcon}>
+                    <Ionicons name="pricetag-outline" size={28} color="#00BFA5" />
+                  </View>
+                  <ThemedText style={styles.categoryText}>{category}</ThemedText>
+                </TouchableOpacity>
+              ))
+            )}
           </View>
         </View>
       </ScrollView>
