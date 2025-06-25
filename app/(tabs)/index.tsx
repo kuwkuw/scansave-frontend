@@ -12,7 +12,8 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  View
+  View,
+  ActivityIndicator
 } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -69,7 +70,9 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>🔥 Hot Deals Near You!</ThemedText>
           {loading ? (
-            <ThemedText>Loading...</ThemedText>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginVertical: 24 }}>
+              <ActivityIndicator size="large" color="#00BFA5" />
+            </View>
           ) : error ? (
             <ThemedText style={{ color: 'red' }}>{error}</ThemedText>
           ) : hotDeals.length === 0 ? (
@@ -92,7 +95,7 @@ export default function HomeScreen() {
           <ThemedText style={styles.sectionTitle}>Browse Categories</ThemedText>
           <View style={styles.categoriesContainer}>
             {categoriesLoading ? (
-              <ThemedText>Loading...</ThemedText>
+              <ActivityIndicator size="small" color="#00BFA5" style={{ marginVertical: 8 }} />
             ) : categoriesError ? (
               <ThemedText style={{ color: 'red' }}>{categoriesError}</ThemedText>
             ) : (

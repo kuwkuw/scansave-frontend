@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect } from 'react';
-import { FlatList, Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { FlatList, Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { OfferCard, Offer } from '@/components/cards/OfferCard';
@@ -13,7 +13,10 @@ import { useOffersFilter } from '../../context/OffersFilterContext';
 
 export default function OffersScreen() {
   const { selectedFilter, setSelectedFilter } = useOffersFilter();
-  const { products, loading, error } = useLatestProducts({limit: 100});
+  const { products, loading, error } = useLatestProducts({
+    limit: 100,
+    category: selectedFilter !== 'All' ? selectedFilter : undefined,
+  });
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
 
   // Aggregate unique categories from products (replaced by backend categories)
@@ -29,12 +32,6 @@ export default function OffersScreen() {
     description: p.category,
     discount: p.oldPrice && p.oldPrice > p.price ? Math.round(100 * (1 - p.price / p.oldPrice)) : 0,
   }));
-
-  const filteredOffers = selectedFilter === 'All'
-    ? offers
-    : offers.filter((o) => o.description === selectedFilter);
-
-  
 
   return (
     <ParallaxScrollView
@@ -53,7 +50,7 @@ export default function OffersScreen() {
         {/* Dynamic filter bar based on product categories */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterBar}>
           {categoriesLoading ? (
-            <ThemedText>Loading...</ThemedText>
+            <ActivityIndicator size="small" color="#00BFA5" style={{ marginVertical: 8 }} />
           ) : categoriesError ? (
             <ThemedText style={{ color: 'red' }}>{categoriesError}</ThemedText>
           ) : (
@@ -80,12 +77,14 @@ export default function OffersScreen() {
         </ScrollView>
 
         {loading ? (
-          <ThemedText>Loading...</ThemedText>
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 32 }}>
+            <ActivityIndicator size="large" color="#00BFA5" />
+          </View>
         ) : error ? (
           <ThemedText style={{ color: 'red' }}>{error}</ThemedText>
         ) : (
           <FlatList
-            data={filteredOffers}
+            data={offers}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <OfferCard offer={item} onPress={(id) => router.push(`/product-details/${id}`)} />

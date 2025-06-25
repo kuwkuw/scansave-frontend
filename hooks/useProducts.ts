@@ -89,6 +89,7 @@ export function useLatestProducts({ limit = 10, category, store }: { limit?: num
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     fetchLatestProducts({ limit, category, store })
       .then(setProducts)
       .catch((e) => setError(e.message))

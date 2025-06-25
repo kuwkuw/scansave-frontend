@@ -29,8 +29,10 @@ export default function TabLayout() {
   const pathname = usePathname();
 
   useEffect(() => {
-    resetFilter();
-  }, [pathname]);
+    if (pathname === '/(tabs)') {
+      resetFilter();
+    }
+  }, [pathname, resetFilter]);
 
   return (
     <Tabs
