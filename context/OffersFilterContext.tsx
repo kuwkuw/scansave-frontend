@@ -5,17 +5,23 @@ interface OffersFilterContextProps {
   selectedFilter: string;
   setSelectedFilter: (filter: string) => void;
   resetFilter: () => void;
+  selectedStore: string;
+  setSelectedStore: (store: string) => void;
+  resetStore: () => void;
 }
 
 const OffersFilterContext = createContext<OffersFilterContextProps | undefined>(undefined);
 
 export const OffersFilterProvider = ({ children }: { children: ReactNode }) => {
   const [selectedFilter, setSelectedFilterRaw] = useState<string>('All');
-  // Debounce the setter
+  const [selectedStore, setSelectedStoreRaw] = useState<string>('All');
+  // Debounce the setters
   const setSelectedFilter = useMemo(() => debounce(setSelectedFilterRaw, 300), []);
+  const setSelectedStore = useMemo(() => debounce(setSelectedStoreRaw, 300), []);
   const resetFilter = () => setSelectedFilter('All');
+  const resetStore = () => setSelectedStore('All');
   return (
-    <OffersFilterContext.Provider value={{ selectedFilter, setSelectedFilter, resetFilter }}>
+    <OffersFilterContext.Provider value={{ selectedFilter, setSelectedFilter, resetFilter, selectedStore, setSelectedStore, resetStore }}>
       {children}
     </OffersFilterContext.Provider>
   );

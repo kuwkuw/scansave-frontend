@@ -241,3 +241,25 @@ export function useProductById(id?: string | number) {
   return { product, loading, error };
 }
 
+export async function fetchStores(): Promise<string[]> {
+  const baseUrl = Constants.expoConfig?.extra?.apiBaseUrl || 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/products/stores`);
+  if (!res.ok) throw new Error('Failed to fetch stores');
+  return res.json();
+}
+
+export function useStores() {
+  const [stores, setStores] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchStores()
+      .then(setStores)
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { stores, loading, error };
+}
+

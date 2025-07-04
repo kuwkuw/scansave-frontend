@@ -6,18 +6,19 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { OfferCard, Offer } from '@/components/cards/OfferCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { usePaginatedOffers, useCategories } from '@/hooks/useProducts';
+import { usePaginatedOffers, useCategories, useStores } from '@/hooks/useProducts';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useOffersFilter } from '../../context/OffersFilterContext';
 
 
 export default function OffersScreen() {
-  const { selectedFilter, setSelectedFilter } = useOffersFilter();
+  const { selectedFilter, setSelectedFilter, selectedStore, setSelectedStore } = useOffersFilter();
   const { products, total, isInitialLoading, isFetchingMore, error, fetchMore, refreshing, refresh } = usePaginatedOffers({
     limit: 20,
     category: selectedFilter !== 'All' ? selectedFilter : undefined,
   });
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
+  const { stores, loading: storesLoading, error: storesError } = useStores();
 
   // Aggregate unique categories from products (replaced by backend categories)
   const filterCategories = ['All', ...categories];
@@ -32,6 +33,12 @@ export default function OffersScreen() {
     description: p.category,
     discount: p.oldPrice && p.oldPrice > p.price ? Math.round(100 * (1 - p.price / p.oldPrice)) : 0,
   }));
+
+  // Use store list from backend
+  const storeList = ['All', ...stores];
+
+  // Filter offers by selected store
+  const filteredOffers = selectedStore === 'All' ? offers : offers.filter((o) => o.store === selectedStore);
 
   return (
     <ParallaxScrollView
@@ -75,7 +82,34 @@ export default function OffersScreen() {
             ))
           )}
         </ScrollView>
-
+        {/* Store filter bar */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterBar}>
+          {storesLoading ? (
+            <ActivityIndicator size="small" color="#00BFA5" style={{ marginVertical: 8 }} />
+          ) : storesError ? (
+            <ThemedText style={{ color: 'red' }}>{storesError}</ThemedText>
+          ) : (
+            storeList.map((store) => (
+              <TouchableOpacity
+                key={store}
+                style={[
+                  styles.filterButton,
+                  selectedStore === store && styles.filterButtonActive,
+                ]}
+                onPress={() => setSelectedStore(store)}
+              >
+                <ThemedText
+                  style={[
+                    styles.filterButtonText,
+                    selectedStore === store && styles.filterButtonTextActive,
+                  ]}
+                >
+                  {store}
+                </ThemedText>
+              </TouchableOpacity>
+            ))
+          )}
+        </ScrollView>
         {isInitialLoading && products.length === 0 ? (
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 32 }}>
             <ActivityIndicator size="large" color="#00BFA5" />
@@ -102,7 +136,7 @@ export default function OffersScreen() {
           </View>
         ) : (
           <FlatList
-            data={offers}
+            data={filteredOffers}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <OfferCard offer={item} onPress={(id) => router.push(`/product-details/${id}`)} />
